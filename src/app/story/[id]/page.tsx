@@ -82,6 +82,7 @@ export default function StoryPage() {
                     alt={story.title}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -142,6 +143,29 @@ export default function StoryPage() {
             </div>
           </div>
 
+          {/* Characters strip */}
+          {(() => {
+            type CharacterLite = { _id: string; name: string; profileImageUrl?: string };
+            const chars = (story as unknown as { characters?: CharacterLite[] }).characters;
+            if (!Array.isArray(chars) || chars.length === 0) return null;
+            return (
+            <div className="mb-6">
+              <div className="flex gap-6">
+                {chars.slice(0, 8).map((ch: CharacterLite) => (
+                  <div key={ch._id} className="flex flex-col items-center gap-2">
+                    <div className="relative h-20 w-20 rounded-full overflow-hidden bg-muted">
+                      {ch.profileImageUrl ? (
+                        <Image src={ch.profileImageUrl} alt={ch.name} fill className="object-cover" unoptimized />
+                      ) : null}
+                    </div>
+                    <p className="text-xs text-muted-foreground max-w-[80px] text-center line-clamp-2">{ch.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            );
+          })()}
+
           {/* Reader Tabs */}
           <Tabs defaultValue="read" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -162,6 +186,7 @@ export default function StoryPage() {
                           alt={`Panel ${currentPanel + 1}`}
                           fill
                           className="object-contain"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-white">

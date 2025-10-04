@@ -8,7 +8,7 @@ fal.config({
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, style = "manga", aspectRatio = "1:1" } = await req.json();
+    const { prompt, style = "manga", aspectRatio = "1:1", seed } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
         image_size: imageSize,
         num_images: 1,
         enable_safety_checker: false, // Disable for artistic content
+        ...(seed ? { seed } : {}),
       },
       logs: true,
       onQueueUpdate: (update) => {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Seedream returns images array
     const imageUrl = result.data?.images?.[0]?.url || result.images?.[0]?.url;
-    const seed = result.data?.seed || result.seed;
+    const generatedSeed = result.data?.seed || result.seed;
     
     if (!imageUrl) {
       console.error("❌ No image URL found in response:", result);
@@ -63,12 +64,12 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("✅ Image generated with Seedream v4:", imageUrl);
-    console.log("🎲 Seed:", seed);
+    console.log("🎲 Seed:", generatedSeed);
 
     return NextResponse.json({
       imageUrl,
       prompt: enhancedPrompt,
-      seed, // Return seed for consistency
+      seed: generatedSeed, // Return actual seed used/generated
       description: enhancedPrompt,
     });
   } catch (error) {

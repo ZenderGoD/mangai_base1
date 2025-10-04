@@ -49,6 +49,11 @@ export const getStory = query({
     if (!story) return null;
 
     const author = await ctx.db.get(story.authorId);
+    // Fetch characters (best-effort)
+    const characters = await ctx.db
+      .query("characters")
+      .withIndex("by_story", (q) => q.eq("storyId", args.storyId))
+      .collect();
     const chapters = await ctx.db
       .query("chapters")
       .withIndex("by_story", (q) => q.eq("storyId", args.storyId))
@@ -56,6 +61,7 @@ export const getStory = query({
 
     return {
       ...story,
+      characters,
       author: author
         ? {
             username: author.name || author.email || "Anonymous",
