@@ -22,41 +22,54 @@ export async function POST(req: NextRequest) {
     // Enhanced prompt for manga/anime style
     const enhancedPrompt = `${style} style: ${prompt}. High quality, detailed artwork, professional manga illustration.`;
 
-    // Use FAL AI SDK for reliable image generation
-    console.log("🎨 Generating image with prompt:", enhancedPrompt);
+    // Use Seedream v4 for high-quality manga generation with better continuity
+    console.log("🎨 Generating image with Seedream v4:", enhancedPrompt);
+    
+    // Calculate image size based on aspect ratio
+    let imageSize: { width: number; height: number };
+    if (aspectRatio === "16:9") {
+      imageSize = { width: 2048, height: 1152 };
+    } else if (aspectRatio === "3:4") {
+      imageSize = { width: 1536, height: 2048 };
+    } else {
+      imageSize = { width: 2048, height: 2048 }; // square
+    }
     
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await fal.subscribe("fal-ai/flux/schnell", {
+    const result: any = await fal.subscribe("fal-ai/bytedance/seedream/v4/text-to-image", {
       input: {
         prompt: enhancedPrompt,
-        image_size: aspectRatio === "16:9" ? "landscape_16_9" : 
-                    aspectRatio === "3:4" ? "portrait_4_3" : "square",
+        image_size: imageSize,
         num_images: 1,
+        enable_safety_checker: false, // Disable for artistic content
       },
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === "IN_PROGRESS") {
-          console.log("⏳ Image generation in progress...");
+          console.log("⏳ Seedream v4 generation in progress...");
         }
       },
     });
 
-    console.log("📦 FAL AI Response:", JSON.stringify(result, null, 2));
+    console.log("📦 Seedream v4 Response:", JSON.stringify(result, null, 2));
 
-    // FLUX Schnell returns images in a different format
+    // Seedream returns images array
     const imageUrl = result.data?.images?.[0]?.url || result.images?.[0]?.url;
+    const seed = result.data?.seed || result.seed;
     
     if (!imageUrl) {
       console.error("❌ No image URL found in response:", result);
       throw new Error("No image generated");
     }
 
-    console.log("✅ Image generated:", imageUrl);
+    console.log("✅ Image generated with Seedream v4:", imageUrl);
+    console.log("🎲 Seed:", seed);
 
     return NextResponse.json({
       imageUrl,
       prompt: enhancedPrompt,
-      description: result.data?.prompt || enhancedPrompt,
+      seed, // Return seed for consistency
+      description: enhancedPrompt,
     });
   } catch (error) {
     console.error("Image generation error:", error);

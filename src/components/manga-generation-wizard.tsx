@@ -75,12 +75,14 @@ interface Character {
   name: string;
   description: string;
   imageUrl?: string;
+  seed?: number; // For consistency
 }
 
 interface Location {
   name: string;
   description: string;
   imageUrl?: string;
+  seed?: number; // For consistency
 }
 
 export function MangaGenerationWizard({ storyId, chapterNumber, onSuccess }: MangaGenerationWizardProps) {
@@ -241,7 +243,7 @@ export function MangaGenerationWizard({ storyId, chapterNumber, onSuccess }: Man
     setStatusMessage("🎨 Generating reference images for characters and locations...");
 
     try {
-      // Generate character images
+      // Generate character images with Seedream v4
       const characterPromises = charactersToUse.map(async (char) => {
         const prompt = `${style} style character design: ${char.description}, full body, reference sheet, white background`;
         const response = await fetch("/api/generate-image", {
@@ -250,10 +252,10 @@ export function MangaGenerationWizard({ storyId, chapterNumber, onSuccess }: Man
           body: JSON.stringify({ prompt, aspectRatio: "3:4" }),
         });
         const data = await response.json();
-        return { ...char, imageUrl: data.imageUrl };
+        return { ...char, imageUrl: data.imageUrl, seed: data.seed }; // Store seed for consistency
       });
 
-      // Generate location images
+      // Generate location images with Seedream v4
       const locationPromises = locationsToUse.map(async (loc) => {
         const prompt = `${style} style background: ${loc.description}, detailed environment, manga panel background`;
         const response = await fetch("/api/generate-image", {
@@ -262,7 +264,7 @@ export function MangaGenerationWizard({ storyId, chapterNumber, onSuccess }: Man
           body: JSON.stringify({ prompt, aspectRatio: "16:9" }),
         });
         const data = await response.json();
-        return { ...loc, imageUrl: data.imageUrl };
+        return { ...loc, imageUrl: data.imageUrl, seed: data.seed }; // Store seed for consistency
       });
 
       const updatedCharacters = await Promise.all(characterPromises);
