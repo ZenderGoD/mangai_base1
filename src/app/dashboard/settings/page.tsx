@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,7 @@ export default function SettingsPage() {
         title: "Settings Saved",
         description: "Your account settings have been updated.",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to save settings",
@@ -94,7 +94,7 @@ export default function SettingsPage() {
         title: "Privacy Settings Saved",
         description: "Your privacy preferences have been updated.",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to save privacy settings",
@@ -113,7 +113,7 @@ export default function SettingsPage() {
         title: "Notification Settings Saved",
         description: "Your notification preferences have been updated.",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to save notification settings",

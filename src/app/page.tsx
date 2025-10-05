@@ -18,6 +18,23 @@ import { api } from "../../convex/_generated/api";
 
 const genres = ["Fantasy", "Romance", "Action", "Mystery", "Sci-Fi", "Horror", "Comedy", "Drama"];
 
+// Type for story data from Convex
+type Story = {
+  _id: string;
+  title: string;
+  description: string;
+  coverImageUrl?: string;
+  genre: string;
+  author: {
+    username: string;
+    imageUrl?: string;
+  } | null;
+  likeCount: number;
+  viewCount: number;
+  chapterCount: number;
+  _creationTime: number;
+};
+
 export default function Home() {
   // Fetch stories from database
   const stories = useQuery(api.stories.getStories, { limit: 8 });
@@ -120,7 +137,7 @@ export default function Home() {
               </div>
             ) : stories.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stories.map((story: any) => (
+                {stories.map((story: Story) => (
                   <StoryCard key={story._id} story={story} />
                 ))}
               </div>
@@ -139,7 +156,7 @@ export default function Home() {
               </div>
             ) : stories.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stories.slice().reverse().map((story: any) => (
+                {stories.slice().reverse().map((story: Story) => (
                   <StoryCard key={story._id} story={story} />
                 ))}
               </div>
@@ -158,7 +175,7 @@ export default function Home() {
               </div>
             ) : stories.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...stories].sort((a, b) => b.likeCount - a.likeCount).map((story: any) => (
+                {[...stories].sort((a, b) => b.likeCount - a.likeCount).map((story: Story) => (
                   <StoryCard key={story._id} story={story} />
                 ))}
               </div>

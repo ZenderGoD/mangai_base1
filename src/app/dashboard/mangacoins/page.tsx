@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,8 +21,7 @@ export default function MangaCoinsPage() {
   const handlePurchase = async (packageId: string) => {
     setPurchasing(packageId);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await purchasePackage({ packageId: packageId as any });
+      await purchasePackage({ packageId: packageId as Id<"packages"> });
       toast({
         title: "Purchase Successful!",
         description: "MangaCoins have been added to your account.",

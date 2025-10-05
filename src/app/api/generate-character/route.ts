@@ -6,6 +6,16 @@ fal.config({
   credentials: process.env.FAL_KEY_ID || "",
 });
 
+// Type for FAL API response
+interface FalImageResponse {
+  data?: {
+    images?: Array<{ url: string }>;
+    seed?: number;
+  };
+  images?: Array<{ url: string }>;
+  seed?: number;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { characterPrompt, style = "manga" } = await req.json();
@@ -27,8 +37,7 @@ export async function POST(req: NextRequest) {
     // Use portrait aspect ratio for character sheets
     const imageSize = { width: 1536, height: 2048 };
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result: any = await fal.subscribe("fal-ai/bytedance/seedream/v4/text-to-image", {
+    const result: FalImageResponse = await fal.subscribe("fal-ai/bytedance/seedream/v4/text-to-image", {
       input: {
         prompt: enhancedPrompt,
         image_size: imageSize,
