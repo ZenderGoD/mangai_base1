@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "@/../convex/_generated/api";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
