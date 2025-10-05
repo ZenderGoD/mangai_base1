@@ -8,25 +8,28 @@ import Image from "next/image";
 
 interface StoryCardProps {
   story: {
-    id: string;
+    _id: string;
     title: string;
     description: string;
-    coverImage: string;
+    coverImageUrl?: string;
     genre: string;
-    author: string;
-    likes: number;
-    views: number;
-    chapters: number;
+    author: {
+      username: string;
+      imageUrl?: string;
+    } | null;
+    likeCount: number;
+    viewCount: number;
+    chapterCount: number;
   };
 }
 
 export function StoryCard({ story }: StoryCardProps) {
   return (
-    <Link href={`/story/${story.id}`}>
+    <Link href={`/story/${story._id}`}>
       <Card className="overflow-hidden transition-all hover:shadow-lg hover:scale-105 cursor-pointer group">
         <div className="relative aspect-[2/3] overflow-hidden">
           <Image
-            src={story.coverImage}
+            src={story.coverImageUrl || "/placeholder-manga.jpg"}
             alt={story.title}
             fill
             className="object-cover transition-transform group-hover:scale-110"
@@ -43,20 +46,20 @@ export function StoryCard({ story }: StoryCardProps) {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Heart className="h-4 w-4" />
-              <span>{story.likes.toLocaleString()}</span>
+              <span>{story.likeCount.toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-1">
               <Eye className="h-4 w-4" />
-              <span>{story.views.toLocaleString()}</span>
+              <span>{story.viewCount.toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
-              <span>{story.chapters} Ch</span>
+              <span>{story.chapterCount} Ch</span>
             </div>
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <p className="text-xs text-muted-foreground">By {story.author}</p>
+          <p className="text-xs text-muted-foreground">By {story.author?.username || "Anonymous"}</p>
         </CardFooter>
       </Card>
     </Link>

@@ -13,57 +13,14 @@ import { BorderBeam } from "@/components/ui/border-beam";
 import Ripple from "@/components/ui/ripple";
 import TextShimmer from "@/components/ui/text-shimmer";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 const genres = ["Fantasy", "Romance", "Action", "Mystery", "Sci-Fi", "Horror", "Comedy", "Drama"];
 
-const featuredStories = [
-  {
-    id: "1",
-    title: "The Dragon's Promise",
-    description: "A young warrior must form an unlikely alliance with a dragon to save their kingdom from an ancient evil.",
-    coverImage: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&h=600&fit=crop",
-    genre: "Fantasy",
-    author: "AI Creator",
-    likes: 1234,
-    views: 5678,
-    chapters: 12,
-  },
-  {
-    id: "2",
-    title: "Neon Nights",
-    description: "In a cyberpunk future, a hacker discovers a conspiracy that threatens humanity's existence.",
-    coverImage: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=400&h=600&fit=crop",
-    genre: "Sci-Fi",
-    author: "AI Creator",
-    likes: 987,
-    views: 3456,
-    chapters: 8,
-  },
-  {
-    id: "3",
-    title: "Whispers in the Dark",
-    description: "A detective investigates mysterious disappearances in a small town with a dark secret.",
-    coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=600&fit=crop",
-    genre: "Mystery",
-    author: "AI Creator",
-    likes: 756,
-    views: 2890,
-    chapters: 10,
-  },
-  {
-    id: "4",
-    title: "Hearts in Bloom",
-    description: "Two strangers find love in the most unexpected place - a magical garden that only appears at twilight.",
-    coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=600&fit=crop",
-    genre: "Romance",
-    author: "AI Creator",
-    likes: 2341,
-    views: 8901,
-    chapters: 15,
-  },
-];
-
 export default function Home() {
+  // Fetch stories from database
+  const stories = useQuery(api.stories.getStories, { limit: 8 });
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Magic UI Effects */}
@@ -156,27 +113,60 @@ export default function Home() {
           </div>
 
           <TabsContent value="trending" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredStories.map((story) => (
-                <StoryCard key={story.id} story={story} />
-              ))}
-            </div>
+            {stories === undefined ? (
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground text-lg mt-4">Loading stories...</p>
+              </div>
+            ) : stories.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {stories.map((story: any) => (
+                  <StoryCard key={story._id} story={story} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground text-lg">No stories found. Create your first story!</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="new" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredStories.slice().reverse().map((story) => (
-                <StoryCard key={story.id} story={story} />
-              ))}
-            </div>
+            {stories === undefined ? (
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground text-lg mt-4">Loading stories...</p>
+              </div>
+            ) : stories.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {stories.slice().reverse().map((story: any) => (
+                  <StoryCard key={story._id} story={story} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground text-lg">No stories found. Create your first story!</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="popular" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...featuredStories].sort((a, b) => b.likes - a.likes).map((story) => (
-                <StoryCard key={story.id} story={story} />
-              ))}
-            </div>
+            {stories === undefined ? (
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground text-lg mt-4">Loading stories...</p>
+              </div>
+            ) : stories.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...stories].sort((a, b) => b.likeCount - a.likeCount).map((story: any) => (
+                  <StoryCard key={story._id} story={story} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground text-lg">No stories found. Create your first story!</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </section>
