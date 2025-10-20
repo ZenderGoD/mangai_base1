@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:all": "concurrently \"pnpm dev\" \"pnpm convex:dev\"",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "convex:dev": "pnpm convex dev",
