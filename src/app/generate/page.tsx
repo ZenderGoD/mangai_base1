@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { MangaGenerationWizard } from "@/components/manga-generation-wizard";
+import { GenerationActivityProvider } from "@/components/manga-wizard/hooks/useGenerationActivity";
+import { LayeredLayout } from "@/components/manga-wizard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -104,11 +106,15 @@ export default function GeneratePage() {
               </Button>
             </Card>
           ) : (
-            <MangaGenerationWizard
-              storyId={storyId}
-              chapterNumber={1}
-              onSuccess={handleSuccess}
-            />
+            <GenerationActivityProvider>
+              <LayeredLayout>
+                <MangaGenerationWizard
+                  storyId={storyId}
+                  chapterNumber={1}
+                  onSuccess={handleSuccess}
+                />
+              </LayeredLayout>
+            </GenerationActivityProvider>
           )}
         </div>
       </div>

@@ -16,11 +16,55 @@ import {
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useState, useEffect } from "react";
 
 export function Navigation() {
   const { setTheme, theme } = useTheme();
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getCurrentUser);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Detect if device is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
+
+  // Helper functions for hover behavior
+  const handleMouseEnter = () => {
+    if (!isMobile) {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        setHoverTimeout(null);
+      }
+      setIsDropdownOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) {
+      const timeout = setTimeout(() => {
+        setIsDropdownOpen(false);
+      }, 150); // Small delay to prevent accidental closes
+      setHoverTimeout(timeout);
+    }
+  };
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -81,9 +125,19 @@ export function Navigation() {
             </Button>
 
             {user ? (
-              <DropdownMenu>
+              <DropdownMenu 
+                open={isDropdownOpen} 
+                onOpenChange={setIsDropdownOpen}
+              >
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="rounded-full"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={() => isMobile && setIsDropdownOpen(!isDropdownOpen)}
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.image} />
                       <AvatarFallback>
@@ -92,7 +146,11 @@ export function Navigation() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent 
+                  align="end"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <div className="px-2 py-1.5 text-sm">
                     <p className="font-medium">{user.name || "User"}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>

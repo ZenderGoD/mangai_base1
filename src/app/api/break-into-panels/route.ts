@@ -22,21 +22,36 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `You are an expert manga panel director and storyteller.
 Break the narrative into exactly ${numberOfPanels} manga panels.
 
+Panel rules:
+- Each panel should capture a single moment or action.
+- Do not describe split panels or multiple simultaneous scenes within one panel.
+- Keep characters, outfits, and locations consistent with previous panels.
+
+CONTINUITY REQUIREMENTS:
+- Maintain character appearance consistency: same hair, clothing, accessories across all panels
+- Track location details: keep background elements, lighting, and setting consistent
+- Preserve dialogue flow: conversations should connect logically between panels
+- Reference previous panel context when describing character positioning and scene flow
+
 For each panel, provide:
 1. A detailed visual description of what should be drawn (including characters: ${characterList}, and locations: ${locationList})
 2. The dialogue/text that appears in the panel
+3. Character appearance notes (for consistency tracking)
+4. Location/setting details (for environmental continuity)
 
 Return a JSON object with this structure:
 {
   "panels": [
     {
       "description": "Detailed visual description of the panel scene, composition, character poses, background elements",
-      "dialogue": "Character dialogue or narration text that appears in this panel"
+      "dialogue": "Character dialogue or narration text that appears in this panel",
+      "characterNotes": "Key appearance details to maintain in future panels",
+      "locationDetails": "Environmental elements to keep consistent"
     }
   ]
 }
 
-Make sure the panels flow naturally and tell a complete story arc.`;
+Make sure the panels flow naturally and tell a complete story arc with perfect visual and narrative continuity.`;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -85,8 +100,44 @@ Make sure the panels flow naturally and tell a complete story arc.`;
 
     const result = JSON.parse(jsonContent);
 
+    const panels = Array.isArray(result?.panels)
+      ? result.panels
+      : Array.isArray(result)
+        ? result
+        : Array.isArray(result?.data?.panels)
+          ? result.data.panels
+          : [];
+
+    const normalized = panels.slice(0, numberOfPanels).map((panel: { description?: string; text?: string; dialogue?: string | string[]; }, index: number) => {
+      const description = typeof panel?.description === "string" && panel.description.trim()
+        ? panel.description.trim()
+        : typeof panel?.text === "string" && panel.text.trim()
+          ? panel.text.trim()
+          : `Panel ${index + 1} scene`;
+
+      let dialogue: string | string[] = "";
+      if (typeof panel?.dialogue === "string") {
+        dialogue = panel.dialogue.trim();
+      } else if (Array.isArray(panel?.dialogue)) {
+        dialogue = panel.dialogue
+          .map((bubble: string | { text: string; character?: string; }) => {
+            if (typeof bubble === "string") return bubble.trim();
+            if (bubble && typeof bubble.text === "string") {
+              return bubble.character ? `${bubble.character}: ${bubble.text.trim()}` : bubble.text.trim();
+            }
+            return "";
+          })
+          .filter(Boolean);
+      }
+
+      return {
+        description,
+        dialogue,
+      };
+    });
+
     return NextResponse.json({
-      panels: result.panels || [],
+      panels: normalized,
     });
   } catch (error) {
     console.error("Panel breaking error:", error);

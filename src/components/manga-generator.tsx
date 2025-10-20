@@ -29,6 +29,7 @@ export function MangaGenerator({ storyId, chapterNumber, onSuccess }: MangaGener
   const [prompt, setPrompt] = useState("");
   const [genre, setGenre] = useState("fantasy");
   const [style, setStyle] = useState("manga");
+  const [colorMode, setColorMode] = useState<"color" | "black-and-white">("color");
   const [numberOfPanels, setNumberOfPanels] = useState(8);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -64,6 +65,7 @@ export function MangaGenerator({ storyId, chapterNumber, onSuccess }: MangaGener
         genre,
         style,
         numberOfPanels,
+        colorMode,
       });
 
       clearInterval(progressInterval);
@@ -100,6 +102,11 @@ export function MangaGenerator({ storyId, chapterNumber, onSuccess }: MangaGener
     { value: "manhua", label: "Manhua (Chinese)" },
     { value: "webtoon", label: "Webtoon" },
     { value: "comic", label: "Western Comic" },
+  ];
+
+  const colorModes = [
+    { value: "color", label: "Color" },
+    { value: "black-and-white", label: "Black & White" },
   ];
 
   return (
@@ -161,6 +168,22 @@ export function MangaGenerator({ storyId, chapterNumber, onSuccess }: MangaGener
                 {styles.map((s) => (
                   <SelectItem key={s.value} value={s.value}>
                     {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="colorMode" className="text-white font-medium text-sm sm:text-base">Color Mode</Label>
+            <Select value={colorMode} onValueChange={(value: "color" | "black-and-white") => setColorMode(value)} disabled={isGenerating}>
+              <SelectTrigger id="colorMode" className="bg-white/10 border-white/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {colorModes.map((mode) => (
+                  <SelectItem key={mode.value} value={mode.value}>
+                    {mode.label}
                   </SelectItem>
                 ))}
               </SelectContent>

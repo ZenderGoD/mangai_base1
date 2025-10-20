@@ -5,6 +5,47 @@ import { authTables } from "@convex-dev/auth/server";
 export default defineSchema({
   ...authTables,
 
+  // Assets - For permanent image storage
+  assets: defineTable({
+    storageId: v.optional(v.id("_storage")), // Links to Convex storage
+    url: v.optional(v.string()), // Public URL
+    alternateStorageIds: v.optional(v.array(v.id("_storage"))), // Alternative versions
+    // Metadata
+    metadata: v.object({
+      width: v.optional(v.number()),
+      height: v.optional(v.number()),
+      fileSize: v.optional(v.number()),
+      mimeType: v.optional(v.string()),
+      hash: v.optional(v.string()), // SHA256 hash for deduplication
+    }),
+    // Usage tracking
+    userId: v.optional(v.id("users")), // Owner
+    storyId: v.optional(v.id("stories")), // Associated story
+    chapterId: v.optional(v.id("chapters")), // Associated chapter
+    characterId: v.optional(v.id("characters")), // Associated character
+    // Asset type
+    assetType: v.union(
+      v.literal("character"),
+      v.literal("scenario"), 
+      v.literal("object"),
+      v.literal("story_cover"),
+      v.literal("chapter_panel"),
+      v.literal("other")
+    ),
+    // Generation info
+    generationId: v.optional(v.id("generations")), // Link to generation record
+    prompt: v.optional(v.string()), // Original generation prompt
+    model: v.optional(v.string()), // AI model used
+    // Timestamps
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_story", ["storyId"])
+    .index("by_character", ["characterId"])
+    .index("by_generation", ["generationId"])
+    .index("by_type", ["assetType"]),
+
   // Override users table to include additional manga platform fields
   users: defineTable({
     name: v.optional(v.string()),

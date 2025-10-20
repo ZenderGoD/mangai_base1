@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Sparkles, TrendingUp, Search } from "lucide-react";
 import Link from "next/link";
-import Particles from "@/components/ui/particles";
 import { Meteors } from "@/components/ui/meteors";
 import { BorderBeam } from "@/components/ui/border-beam";
 import Ripple from "@/components/ui/ripple";
@@ -43,13 +42,6 @@ export default function Home() {
       {/* Hero Section with Magic UI Effects */}
       <section className="relative border-b overflow-hidden">
         <DotPattern className="opacity-50" />
-        <Particles
-          className="absolute inset-0"
-          quantity={100}
-          ease={80}
-          color="#9333ea"
-          refresh={false}
-        />
         <div className="container mx-auto px-4 py-16 sm:py-24 text-center relative z-10">
           <div className="relative inline-block mb-6">
             <Ripple />
@@ -190,13 +182,6 @@ export default function Home() {
 
       {/* Call to Action with Magic UI */}
       <section className="relative border-t overflow-hidden">
-        <Particles
-          className="absolute inset-0"
-          quantity={50}
-          ease={70}
-          color="#ec4899"
-          refresh={false}
-        />
         <div className="container mx-auto px-4 py-16 text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Ready to Create Your Story?

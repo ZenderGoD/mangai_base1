@@ -87,7 +87,7 @@ Respond with JSON:
         "X-Title": "AI Manga Generator",
       },
       body: JSON.stringify({
-        model: "openai/gpt-4o",
+        model: "openai/gpt-5-nano",
         messages,
         temperature: 0.3,
         max_tokens: 500,
